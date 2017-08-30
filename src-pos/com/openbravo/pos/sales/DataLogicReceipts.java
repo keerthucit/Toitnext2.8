@@ -31,6 +31,7 @@ import com.openbravo.data.loader.SerializerWriteString;
 import com.openbravo.data.loader.Session;
 import com.openbravo.data.loader.StaticSentence;
 import com.openbravo.data.loader.Transaction;
+import com.openbravo.pos.forms.AppConfig;
 import com.openbravo.pos.forms.BeanFactoryDataSingle;
 import com.openbravo.pos.inventory.RoleInfo;
 import com.openbravo.pos.inventory.RoleUserInfo;
@@ -39,16 +40,15 @@ import com.openbravo.pos.ticket.RetailTicketInfo;
 import com.openbravo.pos.ticket.RetailTicketLineInfo;
 import com.openbravo.pos.ticket.TicketInfo;
 import com.openbravo.util.date.DateFormats;
+import java.io.File;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.openbravo.pos.forms.AppConfig;
-import java.io.File;
-import java.util.Properties;
 
 /**
  *
@@ -59,8 +59,8 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
     private Session s;
     private String moveTxstatus = "Default";
     public static String cashTallyId = " ";
-    public AppConfig config;
     private Properties m_propsconfig;
+    public AppConfig config;
 
     /**
      * Creates a new instance of DataLogicReceipts
@@ -717,9 +717,13 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
 
         record = (Object[]) new StaticSentence(s, "SELECT UPDATED FROM SHAREDTICKETS WHERE ID='" + tableId + "' AND SPLITID='" + splitId + "'    ", SerializerWriteString.INSTANCE, new SerializerReadBasic(new Datas[]{Datas.STRING})).find();
         return record == null ? "" : (String) record[0];
+
+
+
     }
 
     public List<RoleUserInfo> getUsers() throws BasicException {
+
         return (List<RoleUserInfo>) new StaticSentence(s, "SELECT ID, NAME FROM PEOPLE ", null, new SerializerReadClass(RoleUserInfo.class)).list();
     }
 
@@ -754,8 +758,12 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
             begin++;
             if (l.getTbl_orderId().equals(uniqtableid)) {
                 System.out.println("id" + begin + " check from insertserved txn" + uniqtableid);
+
+
                 Object[] values = new Object[]{UUID.randomUUID().toString(), m_oTicket.getOrderId(), m_oTicket.getPlaceId(), l.getTbl_orderId(), txstatus, l.getKotid(), l.getDuplicateProductName(), l.getMultiply(), l.getPreparationTime(), l.getKdsPrepareStatus(), l.getInstruction(), l.getAddonId(), l.getPrimaryAddon(), l.getProductionAreaType(), l.getStation(), l.getPreparationStatus(), l.getServedBy(), l.getServedTime(), 0};
                 Datas[] datas = new Datas[]{Datas.STRING, Datas.INT, Datas.STRING, Datas.STRING, Datas.STRING, Datas.INT, Datas.STRING, Datas.DOUBLE, Datas.STRING, Datas.STRING, Datas.STRING, Datas.STRING, Datas.INT, Datas.STRING, Datas.STRING, Datas.INT, Datas.STRING, Datas.TIMESTAMP, Datas.INT};
+
+
                 try {
                     new PreparedSentence(s, "INSERT INTO SERVEDTRANSACTION (ID,ORDERNUM,TABLEID,ORDERITEM_ID,TXSTATUS,KOTID,PRODUCTNAME,MULTIPLY,PREPARATIONTIME,KOTDATE,KDSPREPARESTATUS,INSTRUCTION,ADDONID,PRIMARYADDON,PRODUCTIONAREATYPE,STATION,PREPARATIONSTATUS,SERVEDBY,SERVEDTIME,UPDATED,ISKDS) VALUES (?,?,?,?,'ADD',?,?,?,?,NOW(),?,?,?,?,?,?,?,?,?,NOW(),?)", new SerializerWriteBasicExt(datas, new int[]{0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18})).exec(values);
 
@@ -932,6 +940,7 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
 
     public void updateServedTransactionCancelKotBill(RetailTicketInfo m_oTicket, final String orderId, final int ordernum) {
 
+
         Object[] values = new Object[]{ordernum, orderId};
         Datas[] datas = new Datas[]{Datas.INT, Datas.STRING};
         try {
@@ -951,7 +960,7 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
 
     }
 
-    public void updateTiltSession(String cashTallySessionId, String outtime, Map tiltMap, String remks) {
+    public void updateTiltSession(String cashTallySessionId, String outtime, Map tiltMap,String remks) {
         Date endDate = DateFormats.StringToDateTime(outtime);
         try {
             System.out.println("UPDATING TABLE for " + cashTallySessionId);
@@ -962,7 +971,7 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
             Logger.getLogger(DataLogicReceipts.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        updateTiltCloseBalance(cashTallySessionId, tiltMap, "N", remks);
+        updateTiltCloseBalance(cashTallySessionId, tiltMap, "N",remks);
 
 
     }
@@ -979,7 +988,7 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
 
     }
 
-    public void insertTiltSession(String userid, String intime, String outtime, Map tiltMap, String tiltNme, String remks) {
+    public void insertTiltSession(String userid, String intime, String outtime, Map tiltMap, String tiltNme,String remks) {
         String tiltName = tiltNme;
         System.out.println("userid" + userid + "intime" + intime + "outime" + outtime + tiltName);
         Date startDate = DateFormats.StringToDateTime(intime);
@@ -991,6 +1000,7 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
 
         if (endDate == null) {
             isOpen = "Y";
+            //endDate=DateFormat.getDateTimeInstance().format(endDate);
             AppConfig aconfig = new AppConfig(new File(System.getProperty("user.home") + "/openbravopos.properties"));
             aconfig.load();
             String PosNum = aconfig.getProperty("machine.PosNo");
@@ -1005,18 +1015,18 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
                 ex.printStackTrace();
                 Logger.getLogger(DataLogicReceipts.class.getName()).log(Level.SEVERE, null, ex);
             }//end catch
-            insertTiltBalance(cashTallyId, tiltMap, "Y", tiltName, remks);
-
-            // updateTiltOpenBalance(cashTallyId, tiltMap, "Y", tiltName);
+            insertTiltBalance(cashTallyId, tiltMap, "Y", tiltName,remks);
+            
+           // updateTiltOpenBalance(cashTallyId, tiltMap, "Y", tiltName);
         }//endatenull
         if (startDate == null) {
             isOpen = "N";
             System.out.println("cashTallyId" + cashTallyId + "outtime" + outtime);
-            updateTiltSession(cashTallyId, outtime, tiltMap, remks);
+            updateTiltSession(cashTallyId, outtime, tiltMap,remks);
         }
     }//end fn.
 
-    public void updateTiltCloseBalance(String cashTallyId, Map tiltMap, String isOpen, String remks) {
+    public void updateTiltCloseBalance(String cashTallyId, Map tiltMap, String isOpen,String remks) {
         System.out.println("update Tilt Close Bal detail");
         Set mapSet = (Set) tiltMap.entrySet();
         Iterator mapIterator = mapSet.iterator();
@@ -1025,7 +1035,7 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
             String keyValue = (String) mapEntry.getKey();
             Double value = (Double) mapEntry.getValue();
             System.out.println(value);
-            Object[] values = new Object[]{cashTallyId, keyValue, isOpen, value, remks};
+            Object[] values = new Object[]{cashTallyId, keyValue, isOpen, value,remks};
             Datas[] datas = new Datas[]{Datas.STRING, Datas.STRING, Datas.STRING, Datas.DOUBLE, Datas.STRING};
             try {
                 new PreparedSentence(s, "UPDATE TILTBALANCE SET CLOSINGAMOUNT=?,ISOPEN=?,REMARKS=? WHERE SESSIONID = ? AND PAYMENTTYPE=?", new SerializerWriteBasicExt(datas, new int[]{3, 2, 4, 0, 1})).exec(values);
@@ -1037,8 +1047,10 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
 
 
     }//end fn.
-
-    public void updateTiltOpenBalance(String cashTallyId, Map tiltMap, String isOpen, String tiltName) {
+    
+    
+    
+     public void updateTiltOpenBalance(String cashTallyId, Map tiltMap, String isOpen,String tiltName) {
         System.out.println("update TiltOpen Bal detail");
         Set mapSet = (Set) tiltMap.entrySet();
         Iterator mapIterator = mapSet.iterator();
@@ -1060,11 +1072,11 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
 
     }//end fn.
 
-    public void insertTiltBalance(String cashTallyId, Map tiltMap, String isOpen, String tiltName, String remks) {
+    public void insertTiltBalance(String cashTallyId, Map tiltMap, String isOpen, String tiltName,String remks) {
         AppConfig aconfig = new AppConfig(new File(System.getProperty("user.home") + "/openbravopos.properties"));
         aconfig.load();
         String PosNum2 = aconfig.getProperty("machine.PosNo");
-        System.out.println("insertcash txn detail" + PosNum2 + remks);
+        System.out.println("insertcash txn detail" + PosNum2+remks);
         Set mapSet = (Set) tiltMap.entrySet();
         Iterator mapIterator = mapSet.iterator();
         while (mapIterator.hasNext()) {
@@ -1072,19 +1084,19 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
             String keyValue = (String) mapEntry.getKey();
             Double value = (Double) mapEntry.getValue();
             System.out.println(value);
-            Object[] values = new Object[]{UUID.randomUUID().toString(), cashTallyId, keyValue, isOpen, value, tiltName, remks};
-            Datas[] datas = new Datas[]{Datas.STRING, Datas.STRING, Datas.STRING, Datas.STRING, Datas.DOUBLE, Datas.STRING, Datas.STRING};
+            Object[] values = new Object[]{UUID.randomUUID().toString(), cashTallyId, keyValue, isOpen, value,tiltName,remks};
+            Datas[] datas = new Datas[]{Datas.STRING, Datas.STRING, Datas.STRING, Datas.STRING, Datas.DOUBLE,Datas.STRING,Datas.STRING};
 
             try {
-                new PreparedSentence(s, "INSERT INTO TILTBALANCE (ID,SESSIONID,PAYMENTTYPE,ISOPEN,OPENINGAMOUNT,TILT,REMARKS) VALUES (?, ?, ?, ?, ?, ?,?)", new SerializerWriteBasicExt(datas, new int[]{0, 1, 2, 3, 4, 5, 6})).exec(values);
-            } catch (BasicException ex) {
+                new PreparedSentence(s, "INSERT INTO TILTBALANCE (ID,SESSIONID,PAYMENTTYPE,ISOPEN,OPENINGAMOUNT,TILT,REMARKS) VALUES (?, ?, ?, ?, ?, ?,?)", new SerializerWriteBasicExt(datas, new int[]{0, 1, 2, 3, 4, 5 ,6})).exec(values);
+            } catch (BasicException ex) { 
                 ex.printStackTrace();
                 Logger.getLogger(DataLogicReceipts.class.getName()).log(Level.SEVERE, null, ex);
             }//end catch
         }//end while
     }//end fn.
 
-    public void insertSetTiltBalance(String userId, Map tiltMap, String tiltNme) {
+    public void insertSetTiltBalance(String userId,Map tiltMap,String tiltNme) {
         String tiltName = tiltNme;
         String isOpen = " ";
         Set mapSet = (Set) tiltMap.entrySet();
@@ -1095,7 +1107,7 @@ public class DataLogicReceipts extends BeanFactoryDataSingle {
             Double value = (Double) mapEntry.getValue();
             System.out.println(value);
             Object[] values = new Object[]{UUID.randomUUID().toString(), cashTallyId, keyValue, isOpen, value, value, tiltName};
-            Datas[] datas = new Datas[]{Datas.STRING, Datas.STRING, Datas.STRING, Datas.STRING, Datas.DOUBLE, Datas.DOUBLE, Datas.STRING};
+            Datas[] datas = new Datas[]{Datas.STRING, Datas.STRING, Datas.STRING, Datas.STRING, Datas.DOUBLE,Datas.DOUBLE, Datas.STRING};
 
             try {
                 new PreparedSentence(s, "INSERT INTO TILTBALANCE (ID,SESSIONID,PAYMENTTYPE,ISOPEN,OPENINGAMOUNT,CLOSINGAMOUNT,TILT,REMARKS) VALUES (?, ?, ?, ?, ?, ?,?,'ENTER')", new SerializerWriteBasicExt(datas, new int[]{0, 1, 2, 3, 4, 5, 6})).exec(values);

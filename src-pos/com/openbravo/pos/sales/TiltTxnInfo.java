@@ -110,7 +110,7 @@ public class TiltTxnInfo implements SerializableRead, Externalizable {
 
     @Override
     public void readValues(DataRead dr) throws BasicException {
-        System.out.println("readValues");
+       // System.out.println("readValues");
         TPid = dr.getString(1);
         sessionId = dr.getString(2);
         paymenttype = dr.getString(3);
@@ -124,7 +124,7 @@ public class TiltTxnInfo implements SerializableRead, Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        System.out.println("writeExternal");
+       // System.out.println("writeExternal");
 
         out.writeObject(TPid);
         out.writeObject(sessionId);
@@ -143,7 +143,7 @@ public class TiltTxnInfo implements SerializableRead, Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        System.out.println("ReadExternal");
+       // System.out.println("ReadExternal");
         TPid = (String) in.readObject();
         sessionId=(String) in.readObject();
         paymenttype=(String) in.readObject();

@@ -1002,7 +1002,10 @@ public class JRootApp extends JPanel implements AppView {
         jLblPasswordIsNull.setVisible(true);
         jLblInvalidNamePwd.setVisible(true);
         jLblLicenseValid.setVisible(true);
+
+
         listPeople();
+
         printerStart();
 
         // keyboard listener activation
@@ -1795,15 +1798,15 @@ public class JRootApp extends JPanel implements AppView {
             logger.info("login failed");
         }
         System.out.println(m_principalapp.getUser().getName());
-        tiltUserName = m_principalapp.getUser().getName();
-        tiltUserRole = m_principalapp.getUser().getRole();
-        dlReceipts = (DataLogicReceipts) getBean("com.openbravo.pos.sales.DataLogicReceipts");
-        try {
-            tiltRole = dlReceipts.getTiltRolebyName(tiltUserRole);
-        } catch (BasicException ex) {
-            Logger.getLogger(JRootApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.out.println(tiltRole + "--" + tiltUserName + "--" + tiltUserRole);
+//        tiltUserName = m_principalapp.getUser().getName();
+//        tiltUserRole = m_principalapp.getUser().getRole();
+//        dlReceipts = (DataLogicReceipts) getBean("com.openbravo.pos.sales.DataLogicReceipts");
+//        try {
+//            tiltRole = dlReceipts.getTiltRolebyName(tiltUserRole);
+//        } catch (BasicException ex) {
+//            Logger.getLogger(JRootApp.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        System.out.println(tiltRole + "--" + tiltUserName + "--" + tiltUserRole);
 //        if (("CASHIER").equalsIgnoreCase(tiltRole)) {
 //            JTiltCollection.showMessage(this, dlReceipts, true, tiltUserName);
 //            logger.info("End Logout Button :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()));
@@ -1816,8 +1819,7 @@ public class JRootApp extends JPanel implements AppView {
         logger.info("Start Login Action :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()));
         boolean validated = validateFunction();        // TODO add your handling code here:
         if (validated) {
-            
-            System.out.println(m_principalapp.getUser().getName());
+ System.out.println(m_principalapp.getUser().getName());
         tiltUserName = m_principalapp.getUser().getName();
         tiltUserRole = m_principalapp.getUser().getRole();
         dlReceipts = (DataLogicReceipts) getBean("com.openbravo.pos.sales.DataLogicReceipts");
@@ -1832,8 +1834,7 @@ public class JRootApp extends JPanel implements AppView {
 //            logger.info("End Logout Button :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()));
 //            logger.info("Tilt action performed in JRetailTicketBagRest.Map class");
 //        }//End If
-
-            logger.info("User : " + m_principalapp.getUser().getName() + " successfully logged in to POS ");
+//            logger.info("User : " + m_principalapp.getUser().getName() + " successfully logged in to POS ");
 
         } else {
             logger.info("login failed");
@@ -1841,14 +1842,7 @@ public class JRootApp extends JPanel implements AppView {
 
         }
         logger.info("End Login Action :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()));
-//      //  System.out.println(m_principalapp.getUser().getName());
-//        jrpcashloginid = m_principalapp.getUser().getName();
-//        System.out.println(jrpcashloginid);
-//
-//        dlReceipts = (DataLogicReceipts) getBean("com.openbravo.pos.sales.DataLogicReceipts");
-//        JTiltCollection.showMessage(this, dlReceipts, true, jrpcashloginid);
-//        logger.info("End Logout Button :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()));
-//        logger.info("Shift Counter Tally action performed in JRetailTicketBagRest.Map class");
+
     }//GEN-LAST:event_m_jBtnLoginActionPerformed
 
     private void m_jTxtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_m_jTxtPasswordActionPerformed
@@ -1860,14 +1854,14 @@ public class JRootApp extends JPanel implements AppView {
             logger.info("login failed");
         }
         logger.info("End Login Action :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()));
-        tiltUserName = m_principalapp.getUser().getName();
-        tiltUserRole = m_principalapp.getUser().getRole();
-        dlReceipts = (DataLogicReceipts) getBean("com.openbravo.pos.sales.DataLogicReceipts");
-        try {
-            tiltRole = dlReceipts.getTiltRolebyName(tiltUserRole);
-        } catch (BasicException ex) {
-            Logger.getLogger(JRootApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        tiltUserName = m_principalapp.getUser().getName();
+//        tiltUserRole = m_principalapp.getUser().getRole();
+//        dlReceipts = (DataLogicReceipts) getBean("com.openbravo.pos.sales.DataLogicReceipts");
+//        try {
+//            tiltRole = dlReceipts.getTiltRolebyName(tiltUserRole);
+//        } catch (BasicException ex) {
+//            Logger.getLogger(JRootApp.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 //        if (("CASHIER").equalsIgnoreCase(tiltRole)) {
 //            JTiltCollection.showMessage(this, dlReceipts, true, tiltUserName);
 //            logger.info("End Logout Button :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()));

@@ -22,6 +22,8 @@ import com.openbravo.pos.ticket.TicketInfo;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.Frame;
+import java.awt.Window;
 import javax.swing.*;
 import com.openbravo.pos.sales.*;
 import com.openbravo.pos.forms.*;
@@ -58,6 +60,7 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
     private java.util.List<Floor> m_afloors;
     private JRetailTicketsBagRestaurant m_restaurantmap;
     private JRetailTicketsBagRestaurantRes m_jreservations;
+    private JRetailPanelTicket rpTicket = null;
     private Place m_PlaceCurrent;
     // State vars
     private Place m_PlaceClipboard;
@@ -65,7 +68,7 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
     private DataLogicReceipts dlReceipts = null;
     private DataLogicSales dlSales = null;
     private DataLogicSystem dlSystem = null;
-    private AppView m_app;
+    private static AppView m_app;
     private static String tableName;
     private static int noOfCovers;
     private RetailTicketInfo retailTicket;
@@ -101,13 +104,11 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
         dlSales = (DataLogicSales) m_App.getBean("com.openbravo.pos.forms.DataLogicSales");
         dlSystem = (DataLogicSystem) m_App.getBean("com.openbravo.pos.forms.DataLogicSystem");
         dlCustomers = (DataLogicCustomers) m_App.getBean("com.openbravo.pos.customers.DataLogicCustomers");
-
-
         m_restaurantmap = new JRetailTicketsBagRestaurant(app, this);
         m_PlaceCurrent = null;
         m_PlaceClipboard = null;
         customer = null;
-
+System.out.println("RetBagRest"+m_App+app);
         try {
             SentenceList sent = new StaticSentence(
                     app.getSession(),
@@ -1143,6 +1144,10 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
         this.splitId = splitId;
     }
 
+    private void dispose() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     private class MyActionListener implements ActionListener {
 
         private Place m_place;
@@ -1461,9 +1466,9 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
         m_jbtnReservations = new javax.swing.JButton();
         m_jbtnRefresh = new javax.swing.JButton();
         m_jText = new javax.swing.JLabel();
+        m_jbtnLogout = new javax.swing.JButton();
         jButtonOpenCloseCash = new javax.swing.JButton();
         m_jbtnCollectionTally = new javax.swing.JButton();
-        m_jbtnLogout = new javax.swing.JButton();
 
         setLayout(new java.awt.CardLayout());
 
@@ -1493,6 +1498,18 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
             }
         });
 
+        m_jbtnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/openbravo/images/logoutapp.png"))); // NOI18N
+        m_jbtnLogout.setText(AppLocal.getIntString("button.reloadticket")); // NOI18N
+        m_jbtnLogout.setFocusPainted(false);
+        m_jbtnLogout.setFocusable(false);
+        m_jbtnLogout.setMargin(new java.awt.Insets(8, 14, 8, 14));
+        m_jbtnLogout.setRequestFocusEnabled(false);
+        m_jbtnLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                m_jbtnLogoutActionPerformed(evt);
+            }
+        });
+
         jButtonOpenCloseCash.setText("Open/Close Cash");
         jButtonOpenCloseCash.setPreferredSize(new java.awt.Dimension(107, 38));
         jButtonOpenCloseCash.addActionListener(new java.awt.event.ActionListener() {
@@ -1507,7 +1524,7 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
         m_jbtnCollectionTally.setMargin(new java.awt.Insets(8, 14, 8, 14));
         m_jbtnCollectionTally.setMaximumSize(new java.awt.Dimension(95, 36));
         m_jbtnCollectionTally.setMinimumSize(new java.awt.Dimension(95, 36));
-        m_jbtnCollectionTally.setPreferredSize(new java.awt.Dimension(95, 36));
+        m_jbtnCollectionTally.setPreferredSize(new java.awt.Dimension(0, 0));
         m_jbtnCollectionTally.setRequestFocusEnabled(false);
         m_jbtnCollectionTally.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1525,41 +1542,32 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(m_jbtnRefresh)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(m_jbtnCollectionTally, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButtonOpenCloseCash, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(200, 200, 200)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(m_jbtnCollectionTally, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(m_jText)
-                .addContainerGap(81, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
+                .addComponent(m_jbtnLogout)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+            .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(5, 5, 5)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(m_jbtnReservations)
-                    .addComponent(m_jbtnRefresh)
-                    .addComponent(jButtonOpenCloseCash, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(m_jbtnCollectionTally, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(83, 83, 83))
+                    .addComponent(m_jbtnReservations, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(m_jbtnRefresh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButtonOpenCloseCash, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                    .addComponent(m_jbtnCollectionTally, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addComponent(m_jText)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(28, 28, 28)
+                        .addComponent(m_jText))
+                    .addComponent(m_jbtnLogout))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
-
-        m_jbtnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/openbravo/images/logoutapp.png"))); // NOI18N
-        m_jbtnLogout.setText(AppLocal.getIntString("button.reloadticket")); // NOI18N
-        m_jbtnLogout.setFocusPainted(false);
-        m_jbtnLogout.setFocusable(false);
-        m_jbtnLogout.setMargin(new java.awt.Insets(8, 14, 8, 14));
-        m_jbtnLogout.setPreferredSize(new java.awt.Dimension(107, 46));
-        m_jbtnLogout.setRequestFocusEnabled(false);
-        m_jbtnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                m_jbtnLogoutActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -1567,17 +1575,13 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(m_jbtnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(m_jbtnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 20, Short.MAX_VALUE))
         );
 
         m_jPanelMap.add(jPanel1, java.awt.BorderLayout.NORTH);
@@ -1660,11 +1664,11 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
                 checkin = false;
                 m_jbtnCollectionTally.setText("CHECK OUT");
                 m_jbtnCollectionTally.requestFocus();
-
-            } else {
+            }//end If
+            else {
                 m_RootApp = (JRootApp) m_App;
                 m_RootApp.closeAppView();
-            }//end If
+            }
         } else {
             showMessage(this, "Please Check Out to enter the closing balance ,OtherWise, Session will be logged out");
             m_jbtnCollectionTally.setText("CHECK OUT");
@@ -1674,7 +1678,6 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
 
         // m_RootApp = (JRootApp) m_App;
         //   m_RootApp.closeAppView();       
-        
 
     }//GEN-LAST:event_m_jbtnLogoutActionPerformed
 
@@ -1683,8 +1686,6 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
     }//GEN-LAST:event_jButtonOpenCloseCashActionPerformed
 
     private void m_jbtnCollectionTallyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_m_jbtnCollectionTallyActionPerformed
-  
-                                                        
         // TODO add your handling code here:
         m_jbtnCollectionTally.setText("CHECK IN");
 //        m_jbtnCollectionTally.setVisible(false);
@@ -1699,8 +1700,8 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
             if (("CASHIER").equalsIgnoreCase(tiltRole)) {
 
                 m_jbtnCollectionTally.setVisible(true);
-                
-                JTiltCollection.showMessage(this, dlReceipts, true, tiltUserName, dlCustomers,dlSystem,m_App);
+               System.out.println("JRetTickBagRestMap"+m_App);
+                  JTiltCollection.showMessage(this, dlReceipts, true, tiltUserName, dlCustomers, dlSystem, m_App);
                 checkin = false;
                 m_jbtnCollectionTally.setText("CHECK OUT");
                 m_jbtnCollectionTally.requestFocus();
@@ -1719,8 +1720,8 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
 
             if (("CASHIER").equalsIgnoreCase(tiltRole)) {
 
-           
-                JTiltCollection.showMessage(this, dlReceipts, false, tiltUserName, dlCustomers,dlSystem,m_App);
+             
+                      JTiltCollection.showMessage(this, dlReceipts, false, tiltUserName, dlCustomers, dlSystem, m_App);
                 logger.info("End Logout Button :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()));
                 logger.info("Tilt action performed in JRetailTicketBagRest.Map class");
                 m_jbtnCollectionTally.setText("CHECK IN");
@@ -1733,8 +1734,6 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
 
             // System.exit(0);
             }
-        
-
         }
 
     }//GEN-LAST:event_m_jbtnCollectionTallyActionPerformed
@@ -1744,7 +1743,7 @@ public class JRetailTicketsBagRestaurantMap extends JRetailTicketsBag {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel m_jPanelMap;
     private javax.swing.JLabel m_jText;
-    private javax.swing.JButton m_jbtnCollectionTally;
+    public javax.swing.JButton m_jbtnCollectionTally;
     private javax.swing.JButton m_jbtnLogout;
     private javax.swing.JButton m_jbtnRefresh;
     private javax.swing.JButton m_jbtnReservations;

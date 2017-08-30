@@ -70,17 +70,21 @@ public class TicketParser extends DefaultHandler {
     }
     
     public void printTicket(String sIn) throws TicketPrinterException {
+        System.out.println("printTicket(new String(sIn));");
         printTicket(new StringReader(sIn));
     }
     
     public void printTicket(Reader in) throws TicketPrinterException  {
         
         try {
+             System.out.println("printTicket(Reader in)");
             
             if (m_sp == null) {
+               // System.out.println("printTicketn null");
                 SAXParserFactory spf = SAXParserFactory.newInstance();
                 m_sp = spf.newSAXParser();
             }
+             // System.out.println("printTicke t -parsingggggggggggg");
             m_sp.parse(new InputSource(in), this);
                         
         } catch (ParserConfigurationException ePC) {
@@ -112,7 +116,7 @@ public class TicketParser extends DefaultHandler {
     
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException{
-        
+       // System.out.println("TicketParser-StartElement() -"+m_iOutputType);
         switch (m_iOutputType) {
         case OUTPUT_NONE:
             if ("opendrawer".equals(qName)) {
@@ -246,6 +250,7 @@ public class TicketParser extends DefaultHandler {
                         text.toString());
                 text = null;
             } else if ("text".equals(qName)) {
+                 System.out.println("text.toString"+text.toString());
                 if (m_iTextLength > 0) {
                     switch(m_iTextAlign) {
                     case DevicePrinter.ALIGN_RIGHT:
@@ -259,12 +264,15 @@ public class TicketParser extends DefaultHandler {
                         break;
                     }
                 } else {
+                    System.out.println("text.toString"+text.toString());
                     m_oOutputPrinter.printText(m_iTextStyle, text.toString());
                 }
                 text = null;
             } else if ("line".equals(qName)) {
+                System.out.println("lineeeeeeeeeeeeeee");
                 m_oOutputPrinter.endLine();
             } else if ("ticket".equals(qName)) {
+                System.out.println("ticketttt");
                 m_oOutputPrinter.endReceipt();
                 m_iOutputType = OUTPUT_NONE;
                 m_oOutputPrinter = null;
@@ -272,10 +280,13 @@ public class TicketParser extends DefaultHandler {
             break;
         case OUTPUT_DISPLAY:
             if ("line".equals(qName)) { // line 1 or 2 of the display
+                       System.out.println("line1 or 2");
                 if (m_sVisorLine1 == null) {
                     m_sVisorLine1 = m_sVisorLine.toString();
                 } else {
+                   
                     m_sVisorLine2 = m_sVisorLine.toString();
+                     System.out.println("m_sVisorLine.toString()"+m_sVisorLine.toString());
                 }
                 m_sVisorLine = null;
             } else if ("line1".equals(qName)) { // linea 1 del visor

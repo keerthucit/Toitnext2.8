@@ -17,9 +17,6 @@ public class TillInfo implements IKeyed {
 
     private static final long serialVersionUID = 8612449444103L;
     private String tillNo;
-   
-
-
 
     /**
      * Creates new CategoryInfo
@@ -27,7 +24,6 @@ public class TillInfo implements IKeyed {
     public TillInfo(String tillno) {
 
         tillNo = tillno;
-     
 
     }
 

@@ -16,6 +16,7 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with Openbravo POS.  If not, see <http://www.gnu.org/licenses/>.
+
 package com.openbravo.pos.config;
 
 import com.openbravo.data.user.DirtyManager;
@@ -30,64 +31,60 @@ import com.openbravo.pos.util.DirectoryEvent;
  * @author adrianromero
  */
 public class JPanelConfigPosSetting extends javax.swing.JPanel implements PanelConfig {
-
+    
     private DirtyManager dirty = new DirtyManager();
-
-    /**
-     * Creates new form JPanelConfigDatabase
-     */
+    
+    /** Creates new form JPanelConfigDatabase */
     public JPanelConfigPosSetting() {
-
-        initComponents();
-        jchkMomoe.addActionListener(dirty);
-        jchkKitchenDisplay.addActionListener(dirty);
-        jChkServedStatus.addActionListener(dirty);
-        jchkIsPrintRequired.addActionListener(dirty);
-        jchkIsReservation.addActionListener(dirty);
-        jchkMenu.addActionListener(dirty);
-        jchkDiscount.addActionListener(dirty);
-        jchkPromoDiscount.addActionListener(dirty);
-        jchkPaymentModesDisplayed.addActionListener(dirty);
+        
+           initComponents();
+           jchkMomoe.addActionListener(dirty);
+           jchkKitchenDisplay.addActionListener(dirty);
+           jChkServedStatus.addActionListener(dirty);
+           jchkIsPrintRequired.addActionListener(dirty);
+           jchkIsReservation.addActionListener(dirty);
+           jchkMenu.addActionListener(dirty);
+              jchkDiscount.addActionListener(dirty);
+            jchkPromoDiscount.addActionListener(dirty);
+    
     }
-
+    
     public boolean hasChanged() {
         return dirty.isDirty();
     }
-
+    
     public Component getConfigComponent() {
         return this;
     }
-
+   
     public void loadProperties(AppConfig config) {
-        jchkMomoe.setSelected(Boolean.valueOf(config.getProperty("machine.momoestatus")).booleanValue());
-        jchkKitchenDisplay.setSelected(Boolean.valueOf(config.getProperty("machine.kitchendisplay")).booleanValue());
-        jChkServedStatus.setSelected(Boolean.valueOf(config.getProperty("machine.servedstatus")).booleanValue());
-        jchkIsPrintRequired.setSelected(Boolean.valueOf(config.getProperty("machine.printrequired")).booleanValue());
-        jchkIsReservation.setSelected(Boolean.valueOf(config.getProperty("machine.reservationstatus")).booleanValue());
-        jchkMenu.setSelected(Boolean.valueOf(config.getProperty("machine.menustatus")).booleanValue());
+         jchkMomoe.setSelected(Boolean.valueOf(config.getProperty("machine.momoestatus")).booleanValue());
+     jchkKitchenDisplay.setSelected(Boolean.valueOf(config.getProperty("machine.kitchendisplay")).booleanValue());
+     jChkServedStatus.setSelected(Boolean.valueOf(config.getProperty("machine.servedstatus")).booleanValue());
+      jchkIsPrintRequired.setSelected(Boolean.valueOf(config.getProperty("machine.printrequired")).booleanValue());
+       jchkIsReservation.setSelected(Boolean.valueOf(config.getProperty("machine.reservationstatus")).booleanValue());
+       jchkMenu.setSelected(Boolean.valueOf(config.getProperty("machine.menustatus")).booleanValue());
         jchkDiscount.setSelected(Boolean.valueOf(config.getProperty("machine.categorydiscount")).booleanValue());
-        jchkPromoDiscount.setSelected(Boolean.valueOf(config.getProperty("machine.promodiscount")).booleanValue());
-        jchkPaymentModesDisplayed.setSelected(Boolean.valueOf(config.getProperty("machine.allpaymentmodes")).booleanValue());
-        dirty.setDirty(false);
+     jchkPromoDiscount.setSelected(Boolean.valueOf(config.getProperty("machine.promodiscount")).booleanValue());
+       dirty.setDirty(false);
     }
-
+   
     public void saveProperties(AppConfig config) {
-        config.setProperty("machine.momoestatus", Boolean.toString(jchkMomoe.isSelected()));
-        config.setProperty("machine.kitchendisplay", Boolean.toString(jchkKitchenDisplay.isSelected()));
-        config.setProperty("machine.servedstatus", Boolean.toString(jChkServedStatus.isSelected()));
-        config.setProperty("machine.printrequired", Boolean.toString(jchkIsPrintRequired.isSelected()));
+         config.setProperty("machine.momoestatus", Boolean.toString(jchkMomoe.isSelected()));  
+     config.setProperty("machine.kitchendisplay", Boolean.toString(jchkKitchenDisplay.isSelected()));
+     config.setProperty("machine.servedstatus", Boolean.toString(jChkServedStatus.isSelected()));
+      config.setProperty("machine.printrequired", Boolean.toString(jchkIsPrintRequired.isSelected()));
         config.setProperty("machine.reservationstatus", Boolean.toString(jchkIsReservation.isSelected()));
-        config.setProperty("machine.menustatus", Boolean.toString(jchkMenu.isSelected()));
-        config.setProperty("machine.categorydiscount", Boolean.toString(jchkDiscount.isSelected()));
-        config.setProperty("machine.promodiscount", Boolean.toString(jchkPromoDiscount.isSelected()));
-        config.setProperty("machine.allpaymentmodes", Boolean.toString(jchkPaymentModesDisplayed.isSelected()));
+     config.setProperty("machine.menustatus", Boolean.toString(jchkMenu.isSelected()));
+      config.setProperty("machine.categorydiscount", Boolean.toString(jchkDiscount.isSelected()));
+     config.setProperty("machine.promodiscount", Boolean.toString(jchkPromoDiscount.isSelected()));
         dirty.setDirty(false);
     }
-
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
+    
+    /** This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -101,13 +98,17 @@ public class JPanelConfigPosSetting extends javax.swing.JPanel implements PanelC
         jchkMenu = new javax.swing.JCheckBox();
         jchkDiscount = new javax.swing.JCheckBox();
         jchkPromoDiscount = new javax.swing.JCheckBox();
-        jchkPaymentModesDisplayed = new javax.swing.JCheckBox();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(AppLocal.getIntString("Label.Database"))); // NOI18N
 
         jchkKitchenDisplay.setText("Is Kitchen Display Required");
 
         jchkIsPrintRequired.setText("Is Print required on Settle Bill");
+        jchkIsPrintRequired.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jchkIsPrintRequiredActionPerformed(evt);
+            }
+        });
 
         jChkServedStatus.setText("Is Served Status Required");
 
@@ -136,8 +137,6 @@ public class JPanelConfigPosSetting extends javax.swing.JPanel implements PanelC
             }
         });
 
-        jchkPaymentModesDisplayed.setText("All Payment Modes to be Displayed");
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -145,21 +144,22 @@ public class JPanelConfigPosSetting extends javax.swing.JPanel implements PanelC
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jchkMomoe, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jchkKitchenDisplay, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jChkServedStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
-                        .addComponent(jchkIsPrintRequired, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
-                        .addComponent(jchkIsReservation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jchkMenu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jchkDiscount, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jchkPromoDiscount, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jchkPaymentModesDisplayed, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(38, 38, 38))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jChkServedStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
+                            .addComponent(jchkIsPrintRequired, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
+                            .addComponent(jchkIsReservation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jchkMenu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jchkMomoe, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jchkKitchenDisplay, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jchkPromoDiscount, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jchkDiscount, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(38, 38, 38))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -173,9 +173,7 @@ public class JPanelConfigPosSetting extends javax.swing.JPanel implements PanelC
                     .addComponent(jchkKitchenDisplay, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jchkPromoDiscount))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jChkServedStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jchkPaymentModesDisplayed))
+                .addComponent(jChkServedStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jchkIsPrintRequired, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -196,7 +194,7 @@ public class JPanelConfigPosSetting extends javax.swing.JPanel implements PanelC
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(24, 24, 24)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -213,6 +211,12 @@ public class JPanelConfigPosSetting extends javax.swing.JPanel implements PanelC
     private void jchkPromoDiscountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jchkPromoDiscountActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jchkPromoDiscountActionPerformed
+
+    private void jchkIsPrintRequiredActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jchkIsPrintRequiredActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jchkIsPrintRequiredActionPerformed
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jChkServedStatus;
     private javax.swing.JPanel jPanel1;
@@ -222,7 +226,7 @@ public class JPanelConfigPosSetting extends javax.swing.JPanel implements PanelC
     private javax.swing.JCheckBox jchkKitchenDisplay;
     private javax.swing.JCheckBox jchkMenu;
     private javax.swing.JCheckBox jchkMomoe;
-    private javax.swing.JCheckBox jchkPaymentModesDisplayed;
     private javax.swing.JCheckBox jchkPromoDiscount;
     // End of variables declaration//GEN-END:variables
+    
 }

@@ -189,14 +189,16 @@ public class DeviceTicket {
         private Map<String, PrinterWritter> m_apool = new HashMap<String, PrinterWritter>();
 
         public PrinterWritter getPrinterWritter(String con, String port) throws TicketPrinterException {
-
+System.out.println("DeviceTicket .java - getPrinterWritter(String con, String port)");
             String skey = con + "-->" + port;
             PrinterWritter pw = (PrinterWritter) m_apool.get(skey);
             if (pw == null) {
                 if ("serial".equals(con) || "rxtx".equals(con)) {
+                    System.out.println("DeviceTicket .java -if serial");
                     pw = new PrinterWritterRXTX(port);
                     m_apool.put(skey, pw);
                 } else if ("file".equals(con)) {
+                    System.out.println("DeviceTicket .java -else file");
                     pw = new PrinterWritterFile(port);
                     m_apool.put(skey, pw);
                 } else {
@@ -217,18 +219,21 @@ public class DeviceTicket {
     // Receipt printers
     public DevicePrinter getDevicePrinter(String key) {
         DevicePrinter printer = m_deviceprinters.get(key);
-        System.out.println("printer----getDevicePrinter--"+printer);
-        System.out.println("printer----key--"+key);
-//        System.out.println("printer----getPrinterName--"+printer.getPrinterDescription());
+        System.out.println("deviceTicket.java --printer----getDevicePrinter--"+printer);
+        System.out.println("deviceTicket.java --printer----key--"+key);
+        System.out.println("deviceTicket.java --printer----getPrinterName--"+printer.getPrinterDescription());
         return printer == null ? m_nullprinter : printer;
     }
 
     public List<DevicePrinter> getDevicePrinterAll() {
+       //     System.out.println("getDevicePrinterAll() --");
+       
         return m_deviceprinterslist;
     }
     // Utilidades
     public static String getWhiteString(int iSize, char cWhiteChar) {
-
+ //System.out.println("deviceTicket.java -getWhiteString");
+       
         char[] cFill = new char[iSize];
         for (int i = 0; i < iSize; i++) {
             cFill[i] = cWhiteChar;
@@ -237,11 +242,12 @@ public class DeviceTicket {
     }
 
     public static String getWhiteString(int iSize) {
-
+ //System.out.println("deviceTicket.java ----getWhiteString");
         return getWhiteString(iSize, ' ');
     }
 
     public static String alignBarCode(String sLine, int iSize) {
+      //   System.out.println("deviceTicket.java -alignBarCode");
 
         if (sLine.length() > iSize) {
             return sLine.substring(sLine.length() - iSize);
@@ -251,6 +257,7 @@ public class DeviceTicket {
     }
 
     public static String alignLeft(String sLine, int iSize) {
+         // System.out.println("deviceTicket.java alignLeft");
 
         if (sLine.length() > iSize) {
             return sLine.substring(0, iSize);

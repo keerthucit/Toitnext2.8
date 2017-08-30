@@ -14,6 +14,8 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -147,29 +149,32 @@ public class TiltBalanceInfo implements SerializableRead, Externalizable {
 
     @Override
     public void readValues(DataRead dr) throws BasicException {
-        System.out.println("readValues");
-
+      //  System.out.println("readValues");
+try{
         Txnid = dr.getString(1);
 
         sessionId = dr.getString(2);
         paymenttype = dr.getString(3);
         isopen = dr.getString(4);
         openingamount = dr.getDouble(5);
-        if(dr.getDouble(6).equals((null))||dr.getDouble(6).equals((0)) )
-        { closingamount =0.0;       
+        if(dr.getDouble(6).equals(" ")||dr.getDouble(6).equals((null))||dr.getDouble(6).equals((0)))
+        { closingamount=0.0;       
         }
         else
             closingamount = dr.getDouble(6);
         tilt = dr.getString(7);
         remarks = dr.getString(8);
         TLines = new ArrayList<TiltBalanceInfo>();
-        System.out.println(Txnid + paymenttype + tilt);
+       // System.out.println(Txnid + paymenttype + tilt);
+        } catch (NullPointerException ex) {
+            Logger.getLogger(TiltBalanceInfo.class.getName()).log(Level.SEVERE, null, ex);
+        }
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        System.out.println("writeExternal");
+       // System.out.println("writeExternal");
 
         out.writeObject(Txnid);
         out.writeObject(sessionId);
@@ -190,7 +195,7 @@ public class TiltBalanceInfo implements SerializableRead, Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        System.out.println("ReadExternal");
+     //   System.out.println("ReadExternal");
         Txnid = (String) in.readObject();
 
         sessionId = (String) in.readObject();
