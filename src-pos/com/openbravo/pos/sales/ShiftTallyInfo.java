@@ -71,7 +71,7 @@ private String sId;
        sId = dr.getString(1);
         sLines = new ArrayList<ShiftTallyLineInfo>();
 
-       // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -85,7 +85,7 @@ private String sId;
         } catch (Exception e) {
             e.printStackTrace();
         }
-       // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -93,7 +93,7 @@ private String sId;
          System.out.println("ReadExternal");
         sId = (String) in.readObject();
         sLines = (List<ShiftTallyLineInfo>) in.readObject();
-      //  throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
    

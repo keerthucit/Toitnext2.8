@@ -84,6 +84,8 @@ public class TiltSessionInfo implements SerializableRead, Externalizable {
     }
 
     public String getTsnId() {
+        
+        System.out.println("Session Id"+tsnId);
         return tsnId;
     }
 
@@ -117,7 +119,7 @@ public class TiltSessionInfo implements SerializableRead, Externalizable {
 
     @Override
     public void readValues(DataRead dr) throws BasicException {
-      //  System.out.println("readValues");
+        System.out.println("readValues");
         tsnId = dr.getString(1);
         userId = dr.getString(2);
         login = dr.getTimestamp(3);
@@ -132,7 +134,7 @@ public class TiltSessionInfo implements SerializableRead, Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-      //  System.out.println("writeExternal");
+        System.out.println("writeExternal");
 
         out.writeObject(tsnId);
         out.writeObject(userId);
@@ -147,7 +149,7 @@ public class TiltSessionInfo implements SerializableRead, Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-       // System.out.println("ReadExternal");
+        System.out.println("ReadExternal");
         tsnId = (String) in.readObject();
         userId = (String) in.readObject();
         login = (Date) in.readObject();

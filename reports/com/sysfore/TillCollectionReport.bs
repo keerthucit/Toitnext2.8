@@ -31,7 +31,8 @@ report.setSentence(" SELECT   "+
                              "   F.PAYMENTTYPE AS PAYMENTTYPE, "+
                              "  F.AMOUNT AS AMOUNT, "+
                               "  G.OPENINGAMOUNT AS OPENINGAMOUNT,  "+
-                              "  G.CLOSINGAMOUNT AS CLOSINGAMOUNT  "+
+                              "  G.CLOSINGAMOUNT AS CLOSINGAMOUNT,  "+
+                                " G.REMARKS AS REMARKS "+
 
                             " FROM   "+
                              "   (SELECT   "+
@@ -50,7 +51,8 @@ report.setSentence(" SELECT   "+
                                      "   a.sessionid, "+
                                      "   a.PAYMENTTYPE, "+
                                      "   SUM(a.OPENINGAMOUNT) AS OPENINGAMOUNT, "+
-                                     "   SUM(a.CLOSINGAMOUNT) AS CLOSINGAMOUNT "+
+                                     "   SUM(a.CLOSINGAMOUNT) AS CLOSINGAMOUNT , "+
+                                       " a.REMARKS "+
                              "   FROM "+
                                   "  TILTBALANCE a "+
                             "    JOIN TILTSESSION ON TILTSESSION.ID = a.SESSIONID "+
@@ -59,12 +61,6 @@ report.setSentence(" SELECT   "+
                                   "  AND F.TILT = G.TILT AND F.SESSIONID=G.SESSIONID "+
                                  "   ORDER BY LOGIN, PAYMENTTYPE  ");
 
-
-
-
-
-
-                
 
 report.addParameter("LOGIN");
 report.addParameter("LOGOUT");
@@ -75,11 +71,6 @@ report.addParameter("TILTSESSION.USERID");
 report.addQBFFilter(new com.openbravo.pos.ticket.TiltUserFilter());
 
 
-
-
-
-
-
 report.addField("TILT", com.openbravo.data.loader.Datas.STRING);
 report.addField("USER", com.openbravo.data.loader.Datas.STRING);
 report.addField("LOGIN", com.openbravo.data.loader.Datas.TIMESTAMP);
@@ -88,4 +79,5 @@ report.addField("PAYMENTTYPE", com.openbravo.data.loader.Datas.STRING);
 report.addField("AMOUNT", com.openbravo.data.loader.Datas.DOUBLE);
 report.addField("OPENINGAMOUNT", com.openbravo.data.loader.Datas.DOUBLE);
 report.addField("CLOSINGAMOUNT", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("REMARKS", com.openbravo.data.loader.Datas.STRING);
 report;

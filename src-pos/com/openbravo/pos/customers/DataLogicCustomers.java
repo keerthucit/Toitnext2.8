@@ -1429,12 +1429,10 @@ public class DataLogicCustomers extends BeanFactoryDataSingle {
     public List<MobileTypeInfo> getMobileTypeList() throws BasicException {
         return (List<MobileTypeInfo>) new StaticSentence(s, "SELECT ID,MOBILETYPE  FROM MOBILETYPEMASTERS ", null, new SerializerReadClass(MobileTypeInfo.class)).list();
     }
+    
      public List<TiltNameInfo> getTiltList() throws BasicException {
          System.out.println("getTiltFloorList");
         return (List<TiltNameInfo>)new StaticSentence(s, "SELECT ID,TILT,ACCESS FROM TILT WHERE ACCESS='N' ", null, new SerializerReadClass(TiltNameInfo.class)).list();
     } 
-    
-    
-    
     
 }

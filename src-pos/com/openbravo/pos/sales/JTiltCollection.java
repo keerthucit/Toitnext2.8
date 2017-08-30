@@ -34,11 +34,9 @@ import com.openbravo.pos.forms.AppView;
 import com.openbravo.pos.customers.DataLogicCustomers;
 import com.openbravo.pos.forms.AppConfig;
 import com.openbravo.pos.forms.AppLocal;
-import com.openbravo.pos.forms.BeanFactoryApp;
 import com.openbravo.pos.forms.BeanFactoryException;
 import com.openbravo.pos.forms.DataLogicSales;
 import com.openbravo.pos.forms.DataLogicSystem;
-import com.openbravo.pos.forms.JRootApp;
 import com.openbravo.pos.printer.DeviceTicket;
 import com.openbravo.pos.printer.TicketParser;
 import com.openbravo.pos.printer.TicketPrinterException;
@@ -49,7 +47,6 @@ import com.openbravo.pos.scripting.ScriptEngine;
 import com.openbravo.pos.scripting.ScriptException;
 import com.openbravo.pos.scripting.ScriptFactory;
 import com.openbravo.pos.ticket.RetailTicketInfo;
-import com.openbravo.pos.ticket.RetailTicketLineInfo;
 import com.openbravo.pos.ticket.TicketInfo;
 import com.openbravo.pos.ticket.TiltNameInfo;
 import java.awt.BorderLayout;
@@ -58,10 +55,11 @@ import java.awt.Dialog;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Window;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -72,20 +70,14 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Set;
 
-/**
- *
- * @author sysfore
- */
-public class JTiltCollection extends JDialog implements ItemListener, BeanFactoryApp {
+public class JTiltCollection extends JDialog {
 
     public javax.swing.JDialog dEdior = null;
+    private Properties dbp = new Properties();
+    private DataLogicSales dlSales = null;
+    private static DataLogicCustomers dlCustomers = null;
+    protected static AppView m_app;
     public String[] strings = {""};
     public DefaultListModel model = null;
     public java.util.List<DiscountRateinfo> list = null;
@@ -124,39 +116,37 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
     public String tiltPosNum, PosNum;
     public static String tiltName;
     private Properties m_propsconfig;
-    private Properties dbp = new Properties();
-    private DataLogicSales dlSales = null;
-    private static DataLogicCustomers dlCustomers = null;
-    protected static AppView m_app;
     public AppConfig config;
     private ComboBoxValModel jTiltComboModel;
     public String paymentModes;
+    private static DataLogicSystem m_dlSystem = null;
     private TicketParser m_TTP;
     private TicketParser m_TTP2;
     private DeviceTicket m_TP;
-    private static DataLogicSystem m_dlSystem = null;
-    private JRootApp m_RootApp;
 
-    public boolean init(DataLogicReceipts dlReceipt, DataLogicCustomers dlCustomers, DataLogicSystem dlSystem, AppView m_app1) throws BeanFactoryException {
+    public JTiltCollection() {
+    }
+
+    // public boolean init(DataLogicReceipts dlReceipt) {
+    public boolean init(DataLogicReceipts dlReceipt, DataLogicCustomers dlCustomers, DataLogicSystem dlSystem, AppView m_App) throws BeanFactoryException {
+//       m_jTiltComboModel.setSelectedIndex(-1);
         initComponents();
+
 
         AppConfig aconfig = new AppConfig(new File(System.getProperty("user.home") + "/openbravopos.properties"));
         aconfig.load();
         PosNum = aconfig.getProperty("machine.PosNo");
         paymentModes = aconfig.getProperty("machine.allpaymentmodes");
-        m_dlSystem = dlSystem;   
-     
-      
+    //    AppView m_app = null;
 
-        this.m_app = m_app1;
-        System.out.println("Appview_Tilt" + m_app1 + m_app);
-        
+        m_dlSystem = dlSystem;
+        this.m_app = m_App;
+        System.out.println("m_app"+m_app + m_App);
         m_TTP = new TicketParser(m_app.getDeviceTicket(), m_dlSystem);
         m_TP = new DeviceTicket();
-        //jPanelOK.add(m_TP.getDevicePrinter("1").getPrinterComponent(), BorderLayout.CENTER);
-        
-        System.out.println();
-        
+
+      
+
         if (loginOutVar) {
             logger.info("Start Login Action :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             intimeval.setVisible(true);
@@ -165,17 +155,16 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
             outtimelabel.setVisible(false);
             jcheckoutLabel.setVisible(false);
             intimeval.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            jRemarks.setText(AppLocal.getIntString("title.editor"));
             // jTiltComboModel.setEditable(true);
             // AutoCompletion.enable( jTiltComboModel);
-            System.out.println("from init-if");
+
             populateTilt(dlCustomers);
 
 
 
 
         } else {
-            System.out.println("from init-else");
+
             logger.info("Start Login Action :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             outtimeval.setVisible(true);
             outtimelabel.setVisible(true);
@@ -223,10 +212,15 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
             m_jcash.setEnabled(true);
             m_jcash.activate();
         }
-//m_jTiltComboModel.addItemListener((ItemListener) this);
         //  m_jcash.setDoubleValue(0.0);
         dlReceipts = dlReceipt;
 
+//        
+//        m_jTiltComboModel.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                m_jTiltComboModelActionPerformed(evt);
+//            }
+//        });
 
 
 //        File file = new File(System.getProperty("user.home") + "/openbravopos.properties");
@@ -244,15 +238,22 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
 
         setTitle("Collection");
         setVisible(true);
+
+
+//        MyItemListener actionListener = new MyItemListener();
+
+
+
+
         return true;
+
+
     }
 
     private void populateTilt(DataLogicCustomers dlCustomer) {
         System.out.println("POpulate Floor List");
         dlCustomers = dlCustomer;
         try {
-
-
             tiltList = dlCustomers.getTiltList();
             System.out.println(tiltList.size());
         } catch (BasicException ex) {
@@ -260,18 +261,11 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         }
         m_jTiltComboModel.insertItemAt("", 0);
         for (int i = 0; i < tiltList.size(); i++) {
-            System.out.println("insideeeeeeeee populate Tilt for combo   " + tiltList.get(i).getTilt());
-
             m_jTiltComboModel.addItem(tiltList.get(i).getTilt());
-            System.out.println("Insert Initial Tilt Open/Close Balance");
             // tiltName = tiltList.get(i).getTilt();
             //storeinitialtiltbalance(dlReceipts, tiltName);
 
-
         }
-
-
-
 
     }
 
@@ -322,7 +316,7 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
                 Logger.getLogger(JTiltCollection.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            System.out.println("logout list size" + logoutList.size());
+
             if (!logoutList.isEmpty()) {
                 max = Collections.max(logoutList);
                 int maxLongIndex = logoutList.indexOf(max);
@@ -331,7 +325,7 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
                 // max = Collections.max(logoutList);
                 maxLongIndex = logoutList.indexOf(max);
                 maxLong = ((Long) max).longValue();
-                System.out.println("Milliseconds to Date using Calendar:" + maxLong + df.format(maxLong));
+
 
                 //Fetch Index of Max prev .Logout time of tilt from Tiltsession-Info
 
@@ -349,25 +343,17 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
                         Logger.getLogger(JTiltCollection.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
-//                    if (l.longValue() == maxLong.longValue()) {
-//                        System.out.println("Matched" + l + "__" + maxLong);
-//                        logoutindex = tiltSsnList.indexOf(t);
-//                        System.out.println("max logout index1" + logoutindex);
-//                        ssnId = t.getTsnId();
-//                        System.out.println("max logout ----Id1 from session table" + ssnId);
-//                    }
+
                     if (df.format(l).toString().equals(df.format(maxLong))) {
-                        System.out.println("Matched22ll+" + df.format(l).toString() + "__" + df.format(maxLong));
                         logoutindex = tiltSsnList.indexOf(t);
-                        System.out.println("max logout index2" + logoutindex);
                         ssnId = t.getTsnId();
-                        System.out.println("max logout ----Id2 from session table" + ssnId);
+
                     }
                 }
 
             }//end for 
 
-            System.out.println("max logout IDDDD from session table" + ssnId);
+
 
         } catch (NullPointerException ex) {
             Logger.getLogger(JTiltCollection.class.getName()).log(Level.SEVERE, null, ex);
@@ -418,15 +404,6 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
             }
 
 
-
-//            System.out.println("cardsum" + cardsum);
-//            System.out.println("cashsum" + cashsum);
-//            System.out.println("chequesum" + chequesum);
-//            System.out.println("complesum" + complesum);
-//            System.out.println("STaffsum" + staffsum);
-//            System.out.println("Vouchersum" + vouchersum);
-//            System.out.println("Mobilesum" + mobsum);
-
             m_jcomplementary.setDoubleValue(complesum);
             m_jcard.setDoubleValue(cardsum);
             m_jcash.setDoubleValue(cashsum);
@@ -456,10 +433,8 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
 
         System.out.println(tiltTxnList.size());
         for (int i = 0; i < tiltTxnList.size(); i++) {
-            System.out.println("insideeeeeeeee  " + tiltTxnList.get(i).getTilt());
             tiltPosNum = tiltTxnList.get(i).getTilt();
 
-            // System.out.println(tiltTxnList.get(i).getSessionId().toString() + "--" + tiltTxnList.get(i).getTilt().toString() + "--" + tiltTxnList.get(i).getPaymenttype().toString() + "--" + tiltTxnList.get(i).getAmount().toString());
             if (tiltPosNum.equals(PosNum)) {
                 String paytype = tiltTxnList.get(i).getPaymenttype().toString();
                 double amt = tiltTxnList.get(i).getAmount().doubleValue();
@@ -487,13 +462,7 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
                 }
 
             }//end for
-            System.out.println("cardsum" + cardsum);
-            System.out.println("cashsum" + cashsum);
-            System.out.println("chequesum" + chequesum);
-            System.out.println("complesum" + complesum);
-            System.out.println("STaffsum" + staffsum);
-            System.out.println("Vouchersum" + vouchersum);
-            System.out.println("Mobilesum" + mobsum);
+
 
             m_jcomplementary.setDoubleValue(complesum);
             m_jcard.setDoubleValue(cardsum);
@@ -505,26 +474,12 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
 
 
         }
-
-
-        //            for (int i = 0; i < tiltSsnList.size(); i++) {
-//                System.out.println("insideeeeeeeee  "+tiltSsnList);
-//                 System.out.println(tiltSsnList.get(i).getTilt());
-//            }
-//            for (int i = 0; i < tiltBalList.size(); i++) {
-//                 System.out.println(tiltBalList.get(i).getTilt());
-//            }
-//              for (int i = 0; i < tilttxn.size(); i++) {
-//                    System.out.println("insideeeeeeeee  "+tiltTxnList);
-//            System.out.println(tilttxn.get(i).getTilt().toString()+"--");
-//              }
-
     }
 
-    // public static void showMessage(Component parent, DataLogicReceipts dlReceipt, boolean loginout, String cashloginid, DataLogicCustomers dlCustomer) {
-    public static void showMessage(Component parent, DataLogicReceipts dlReceipt, boolean loginout, String cashloginid, DataLogicCustomers dlCustomer, DataLogicSystem dlSystem, AppView m_app1) {
-        m_app = m_app1;
+    public static void showMessage(Component parent, DataLogicReceipts dlReceipt, boolean loginout, String cashloginid, DataLogicCustomers dlCustomer, DataLogicSystem dlSystem, AppView m_App) {
+        m_app = m_App;
         m_dlSystem = dlSystem;
+
         parentLocal = parent;
         loginOutVar = loginout;
         userId = cashloginid;
@@ -532,19 +487,16 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         // jRetailPanelTicket = jrpTicket;
         dlCustomers = dlCustomer;
         if (loginout) {
-
+            //showMessage(parent, dlReceipts, 1, dlCustomers);
             showMessage(parent, dlReceipts, 1, dlCustomers, m_dlSystem, m_app);
         } else {
-
+            // showMessage(parent, dlReceipts, 1, dlCustomers);
             showMessage(parent, dlReceipts, 1, dlCustomers, m_dlSystem, m_app);
         }
     }
 
     private static void showMessage(Component parent, DataLogicReceipts dlReceipt, int x) {
         dlReceipts = dlReceipt;
-        System.out.println("13" + userId + loginOutVar);//
-        // JRetailPanelTicket = jrpTicket;
-        //  dlCustomers = jrpTicket.dlCustomers;
         Window window = getWindow(parent);
         JTiltCollection myMsg;
         if (window instanceof Frame) {
@@ -552,9 +504,7 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         } else {
             myMsg = new JTiltCollection((Dialog) window, true);
         }
-//        boolean completed = myMsg.init(dlReceipts);
 
-        //  return completed;
     }
 
     public static void showMessage(Component parent, DataLogicReceipts dlReceipt, boolean loginout, String cashloginid) {
@@ -571,11 +521,10 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         }
     }
 
-    //private static void showMessage(Component parent, DataLogicReceipts dlReceipt, int x, DataLogicCustomers dlCustomer) {
-    private static void showMessage(Component parent, DataLogicReceipts dlReceipt, int x, DataLogicCustomers dlCustomer, DataLogicSystem dlSystem, AppView m_app1) {
-        m_app = m_app1;
-        m_dlSystem = dlSystem;
+    private static void showMessage(Component parent, DataLogicReceipts dlReceipt, int x, DataLogicCustomers dlCustomer, DataLogicSystem dlSystem, AppView m_App) {
+        m_app = m_App;
         dlReceipts = dlReceipt;
+        m_dlSystem = dlSystem;
         System.out.println("13" + userId + loginOutVar);//
         // JRetailPanelTicket = jrpTicket;
         dlCustomers = dlCustomer;
@@ -586,9 +535,10 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         } else {
             myMsg = new JTiltCollection((Dialog) window, true);
         }
-//        boolean completed = myMsg.init(dlReceipts, dlCustomers);
+        //boolean completed = myMsg.init(dlReceipts);
 
         boolean completed = myMsg.init(dlReceipts, dlCustomers, m_dlSystem, m_app);
+
 
         //  return completed;
     }
@@ -615,6 +565,9 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
+        jLayeredPane1 = new javax.swing.JLayeredPane();
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        jLayeredPane2 = new javax.swing.JLayeredPane();
         jLabel1 = new javax.swing.JLabel();
         m_jKeys = new com.openbravo.editor.JEditorNumberKeys();
         m_jcard = new com.openbravo.editor.JEditorDouble();
@@ -636,16 +589,13 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         userval = new javax.swing.JLabel();
         intimeval = new javax.swing.JLabel();
         outtimeval = new javax.swing.JLabel();
+        ok = new javax.swing.JButton();
         m_jTiltComboModel = new javax.swing.JComboBox();
         jLabel11 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jRemarks = new javax.swing.JTextArea();
         jcheckoutLabel = new javax.swing.JLabel();
-        jPrintPanel = new javax.swing.JPanel();
-        m_jprint = new javax.swing.JButton();
-        jPanelOK = new javax.swing.JPanel();
-        ok = new javax.swing.JButton();
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
@@ -699,6 +649,13 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
 
         outtimeval.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
 
+        ok.setText("OK");
+        ok.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                okActionPerformed(evt);
+            }
+        });
+
         m_jTiltComboModel.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 m_jTiltComboModelItemStateChanged(evt);
@@ -720,67 +677,13 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         jScrollPane2.setViewportView(jRemarks);
 
         jcheckoutLabel.setText("Tilt");
-        jcheckoutLabel.addInputMethodListener(new java.awt.event.InputMethodListener() {
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
-            }
-            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
-                jcheckoutLabelInputMethodTextChanged(evt);
-            }
-        });
-
-        m_jprint.setText("PrintTilt");
-        m_jprint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                m_jprintActionPerformed(evt);
-            }
-        });
-
-        org.jdesktop.layout.GroupLayout jPrintPanelLayout = new org.jdesktop.layout.GroupLayout(jPrintPanel);
-        jPrintPanel.setLayout(jPrintPanelLayout);
-        jPrintPanelLayout.setHorizontalGroup(
-            jPrintPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPrintPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(m_jprint, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 96, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPrintPanelLayout.setVerticalGroup(
-            jPrintPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPrintPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(m_jprint)
-                .addContainerGap(18, Short.MAX_VALUE))
-        );
-
-        ok.setText("OK");
-        ok.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                okActionPerformed(evt);
-            }
-        });
-
-        org.jdesktop.layout.GroupLayout jPanelOKLayout = new org.jdesktop.layout.GroupLayout(jPanelOK);
-        jPanelOK.setLayout(jPanelOKLayout);
-        jPanelOKLayout.setHorizontalGroup(
-            jPanelOKLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanelOKLayout.createSequentialGroup()
-                .add(ok, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 248, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(0, 24, Short.MAX_VALUE))
-        );
-        jPanelOKLayout.setVerticalGroup(
-            jPanelOKLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanelOKLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(ok, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 35, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(34, 34, 34)
+                .add(25, 25, 25)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -788,94 +691,81 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
                                 .add(jLabel10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 55, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .add(26, 26, 26))
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                                    .add(outtimelabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .add(intimelabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 82, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)))
+                                .add(intimelabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 82, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(12, 12, 12)))
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
                                 .add(userval, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .add(734, 734, 734))
-                            .add(layout.createSequentialGroup()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(outtimeval, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 177, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(intimeval, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 162, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .add(40, 40, 40)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(layout.createSequentialGroup()
-                                        .add(jcheckoutLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 107, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(jPrintPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                    .add(layout.createSequentialGroup()
-                                        .add(jLabel11, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 55, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(18, 18, 18)
-                                        .add(m_jTiltComboModel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 132, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                                .add(636, 636, 636))))
+                                .add(102, 102, 102)
+                                .add(jLabel11, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 35, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                .add(jcheckoutLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 138, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(1, 1, 1)
+                                .add(m_jTiltComboModel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 129, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .add(intimeval, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 169, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                     .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                            .add(layout.createSequentialGroup()
+                                .add(outtimelabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 82, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                .add(outtimeval, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(layout.createSequentialGroup()
+                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                                        .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 94, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 94, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(jLabel1)
+                                        .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 94, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(jLabel7, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .add(jLabel6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .add(24, 24, 24)
+                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                                    .add(m_jcheque, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                                    .add(m_jcomplementary, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                                    .add(m_jvoucher, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                                .add(m_jstaff, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                            .add(m_jcard, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                        .add(m_jcash, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(m_jmobile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                .add(ok, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 248, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(jLabel5)
-                                    .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 94, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 94, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(jLabel6)
-                                    .add(jLabel1)
-                                    .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 94, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(jLabel7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 86, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .add(36, 36, 36)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                                .add(m_jcheque, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                .add(m_jcomplementary, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                .add(m_jmobile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                .add(m_jvoucher, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                            .add(m_jstaff, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                        .add(m_jcard, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                    .add(m_jcash, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                            .add(jPanelOK, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                .add(m_jKeys, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 181, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(layout.createSequentialGroup()
-                                .add(18, 18, 18)
+                                .add(14, 14, 14)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(jLabel8)))
-                            .add(layout.createSequentialGroup()
-                                .add(27, 27, 27)
-                                .add(m_jKeys, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                    .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 181, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(jLabel8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 97, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(30, 30, 30)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel10, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, userval, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jcheckoutLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 33, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(layout.createSequentialGroup()
-                        .add(jPrintPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(24, 24, 24)))
-                .add(8, 8, 8)
+                .add(32, 32, 32)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel10, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, userval, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(jLabel11, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(m_jTiltComboModel)
+                        .add(jcheckoutLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 33, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(intimelabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(intimeval, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .add(9, 9, 9))
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(jLabel11, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(m_jTiltComboModel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)))
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(outtimeval, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(outtimelabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                    .add(intimelabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(intimeval, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(9, 9, 9)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(outtimelabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(outtimeval, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(m_jcash, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -891,36 +781,39 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
                                 .add(jLabel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .add(21, 21, 21)
+                                .add(18, 18, 18)
                                 .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(layout.createSequentialGroup()
                                 .add(m_jcomplementary, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .add(21, 21, 21)
+                                .add(18, 18, 18)
                                 .add(m_jmobile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                         .add(18, 18, 18)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(jLabel7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(m_jstaff, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(m_jstaff, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                                .add(jLabel7)
+                                .add(3, 3, 3))))
                     .add(m_jKeys, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 249, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(21, 21, 21)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(m_jvoucher, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .add(18, 18, 18)
-                        .add(jPanelOK, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(ok))
                     .add(layout.createSequentialGroup()
-                        .add(4, 4, 4)
-                        .add(jLabel8)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(94, Short.MAX_VALUE))
+                        .add(3, 3, 3)
+                        .add(jLabel8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 18, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(0, 3, Short.MAX_VALUE)))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         getAccessibleContext().setAccessibleParent(this);
 
-        setSize(new java.awt.Dimension(653, 690));
+        setSize(new java.awt.Dimension(568, 549));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -972,13 +865,9 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         dlReceipts.insertTiltTransaction(dlReceipts.cashTallyId, "Staff", 0.0, tiltName);
         dlReceipts.insertTiltTransaction(dlReceipts.cashTallyId, "Mobile", 0.0, tiltName);
         dlReceipts.insertTiltTransaction(dlReceipts.cashTallyId, "Cheque", 0.0, tiltName);
-
-
-
     }
     private void okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okActionPerformed
         // TODO add your handling code here:
-
         System.out.println(loginOutVar);
         int res = JOptionPane.showConfirmDialog(this, AppLocal.getIntString("message.Check"), AppLocal.getIntString("message.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (res == JOptionPane.YES_OPTION) {
@@ -986,57 +875,27 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
                 System.out.println("on checkin" + loginOutVar);
                 int findex = m_jTiltComboModel.getSelectedIndex();
                 findex--;
-                System.out.println("index" + findex + "Name" + tiltList.get(findex).getTilt());
-                //tiltName = tiltList.get(findex).getTilt();
                 tiltName = m_jTiltComboModel.getSelectedItem().toString();
-                System.out.println("TILT NAME:" + tiltName);
                 dlReceipts.updateSetTilt(tiltName);
                 storecashtallysession(dlReceipts, tiltName);
-
                 PopulatetiltTransaction(dlReceipts, tiltName);
-
-
                 dispose();
             } else {
-
-                System.out.println("on checkout" + loginOutVar);
-                System.out.println("TILT NAME:" + tiltName);
-
                 dlReceipts.updateUnSetTilt(tiltName);
                 storecashtallysession(dlReceipts, tiltName);
-
+               
                 dispose();
-                // System.exit(0);
-
 
             }
 
-
-
     }//GEN-LAST:event_okActionPerformed
     }
-
-//     public void visorTicketLine(RetailTicketLineInfo oLine) {
-//        if (oLine == null) {
-//            m_app.getDeviceTicket().getDeviceDisplay().clearVisor();
-//        } else {
-//            try {
-//                ScriptEngine script = ScriptFactory.getScriptEngine(ScriptFactory.VELOCITY);
-//                script.put("ticketline", oLine);
-//                m_TTP.printTicket(script.eval(dlSystem.getResourceAsXML("Printer.Tilt")).toString());
-//            } catch (ScriptException e) {
-//                MessageInf msg = new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.cannotprintline"), e);
-//                msg.show(JRetailPanelTicket.this);
-//            } catch (TicketPrinterException e) {
-//                MessageInf msg = new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.cannotprintline"), e);
-//                msg.show(JRetailPanelTicket.this);
-//            }
-//        }
     private void m_jTiltComboModelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_m_jTiltComboModelActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_m_jTiltComboModelActionPerformed
 
     private void m_jTiltComboModelItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_m_jTiltComboModelItemStateChanged
+
         // TODO add your handling code here:
         String OutStrng;
         if (evt.getStateChange() == java.awt.event.ItemEvent.SELECTED) {
@@ -1044,12 +903,8 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         } else {
             OutStrng = "DeSelected: " + (String) evt.getItem();
         }
-
-        System.out.println("Item Changed Event" + OutStrng);
         tiltName = OutStrng;
         String tiltName11 = m_jTiltComboModel.getSelectedItem().toString();
-        System.out.println("Item Changed Event" + tiltName + tiltName11);
-        // storecashtallysession(dlReceipts, tiltName);
         try {
             populateTiltScreen(dlReceipts, tiltName);
         } catch (NullPointerException ex) {
@@ -1057,56 +912,8 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         } catch (BasicException ex) {
             Logger.getLogger(JTiltCollection.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }//GEN-LAST:event_m_jTiltComboModelItemStateChanged
-
-    private void jcheckoutLabelInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_jcheckoutLabelInputMethodTextChanged
-    }//GEN-LAST:event_jcheckoutLabelInputMethodTextChanged
-
-    private void m_jprintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_m_jprintActionPerformed
-
-        try {
-            System.out.println("Iprinbter.tilt is file name  -in configuration -users and roles>resources section -fn call");
-            printTicket("Printer.Tilt", m_dlSystem);
-        } catch (ScriptException ex) {
-            Logger.getLogger(JNonServedLinesPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_m_jprintActionPerformed
-
-    private void printTicket(String sresourcename, DataLogicSystem dlSystem) throws ScriptException {
-        m_dlSystem = dlSystem;
-        System.out.println("printTiltCollection -fn call");
-        String sresource = m_dlSystem.getResourceAsXML(sresourcename);
-        ScriptEngine script = ScriptFactory.getScriptEngine(ScriptFactory.VELOCITY);
-        if (sresource == null) {
-            MessageInf msg = new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.cannotprintticket"));
-            msg.show(JTiltCollection.this);
-        } else {
-
-            try {
-                System.out.println("Valuesssssssssss" + userId + tiltName + cashVal + cardVal + compleVal + mobileVal + staffVal + voucherVal + chequeVal);
-                //System.out.println(cashsum + cardsum + complesum + mobsum + staffsum + vouchersum + chequesum);
-                script.put("UserName", userId);
-                script.put("Tilt", tiltName);
-                script.put("Cash", cashVal);
-                script.put("Card", cardVal);
-                script.put("Cheque", chequeVal);
-                script.put("Complementary", compleVal);
-                script.put("Mobile", mobileVal);
-                script.put("Staff", staffVal);
-                script.put("Voucher", voucherVal);
-                m_TTP.printTicket(script.eval(sresource).toString());
-                System.out.println("m_TTP.printTicket(script.eval(sresource).toString())t");
-
-            } catch (ScriptException e) {
-                MessageInf msg = new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.cannotprintticket"), e);
-                msg.show(JTiltCollection.this);
-            } catch (TicketPrinterException e) {
-                MessageInf msg = new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.cannotprintticket"), e);
-                Logger.getLogger(JTiltCollection.class.getName()).log(Level.SEVERE, null, e);
-                msg.show(JTiltCollection.this);
-            }
-        }
-    }
 
     private void storecashtallysession(DataLogicReceipts dlReceipt, String tiltNme) {
         System.out.println(dlReceipt);
@@ -1192,21 +999,11 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         tiltMap.put("Mobile", mobileVal);
         tiltMap.put("Staff", staffVal);
         tiltMap.put("Voucher", voucherVal);
-        System.out.println("Values" + cashVal + cardVal + chequeVal + compleVal + staffVal + voucherVal + mobileVal + intime + outime + userId);
-
-
-        System.out.println("user id :" + userId + "intime : " + intime + "outtime" + outime + tiltName);
-
-
-
         if (loginOutVar) {
-
             String remks = jRemarks.getText();
-            System.out.println(jRemarks.getText() + remks);
             dlReceipts.insertTiltSession(userId, intime, outime, tiltMap, tiltName, remks);
-
         } else {
-            try {
+             try {
                 System.out.println("prinber.tilt is file name -OKK -in configuration -users and roles>resources section -fn call");
                 // printTicket("Printer.Tilt", tiltBalList, m_dlSystem,tiltName);
                 printTicket("Printer.Tilt", m_dlSystem);
@@ -1214,20 +1011,56 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
                 Logger.getLogger(JNonServedLinesPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
             String remks = jRemarks.getText();
-            System.out.println(jRemarks.getText() + remks);
+                
+    
             dlReceipts.insertTiltSession(userId, intime, outime, tiltMap, tiltName, remks);
         }
-
     }
 
+
+
+private void printTicket(String sresourcename, DataLogicSystem dlSystem) throws ScriptException {
+        m_dlSystem = dlSystem;
+        System.out.println("printTiltCollection -fn call");
+        String sresource = m_dlSystem.getResourceAsXML(sresourcename);
+        ScriptEngine script = ScriptFactory.getScriptEngine(ScriptFactory.VELOCITY);
+        if (sresource == null) {
+            MessageInf msg = new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.cannotprintticket"));
+            msg.show(JTiltCollection.this);
+        } else {
+
+            try {
+                System.out.println("Valuesssssssssss" + userId + tiltName + cashVal + cardVal + compleVal + mobileVal + staffVal + voucherVal + chequeVal);
+                //System.out.println(cashsum + cardsum + complesum + mobsum + staffsum + vouchersum + chequesum);
+                script.put("UserName", userId);
+                script.put("Tilt", tiltName);
+                script.put("Cash", cashVal);
+                script.put("Card", cardVal);
+                script.put("Cheque", chequeVal);
+                script.put("Complementary", compleVal);
+                script.put("Mobile", mobileVal);
+                script.put("Staff", staffVal);
+                script.put("Voucher", voucherVal);
+                m_TTP.printTicket(script.eval(sresource).toString());
+                System.out.println("m_TTP.printTicket(script.eval(sresource).toString())t");
+
+            } catch (ScriptException e) {
+                MessageInf msg = new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.cannotprintticket"), e);
+                msg.show(JTiltCollection.this);
+            } catch (TicketPrinterException e) {
+                MessageInf msg = new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.cannotprintticket"), e);
+                Logger.getLogger(JTiltCollection.class.getName()).log(Level.SEVERE, null, e);
+                msg.show(JTiltCollection.this);
+            }
+        }
+    }
     private void storeinitialtiltbalance(DataLogicReceipts dlReceipt, String tiltNme) {
         //Initial entry of zero records in titlbalance
-        System.out.println("storeinitialtiltbalance");
-        System.out.println(dlReceipt);
+
         dlReceipts = dlReceipt;
 
         tiltName = tiltNme;
-        System.out.println("storeinitialtiltbalance" + tiltName);
+
         tiltMap.put("Cash", 0.0);
         tiltMap.put("Card", 0.0);
         tiltMap.put("Cheque", 0.0);
@@ -1253,6 +1086,7 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         return true;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel intimelabel;
     private javax.swing.JLabel intimeval;
     private javax.swing.JLabel jLabel1;
@@ -1265,8 +1099,8 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JPanel jPanelOK;
-    private javax.swing.JPanel jPrintPanel;
+    private javax.swing.JLayeredPane jLayeredPane1;
+    private javax.swing.JLayeredPane jLayeredPane2;
     private javax.swing.JTextArea jRemarks;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -1279,7 +1113,6 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
     private com.openbravo.editor.JEditorDouble m_jcheque;
     private com.openbravo.editor.JEditorDouble m_jcomplementary;
     private com.openbravo.editor.JEditorDouble m_jmobile;
-    private javax.swing.JButton m_jprint;
     private com.openbravo.editor.JEditorDouble m_jstaff;
     private com.openbravo.editor.JEditorDouble m_jvoucher;
     private javax.swing.JButton ok;
@@ -1312,22 +1145,5 @@ public class JTiltCollection extends JDialog implements ItemListener, BeanFactor
         this.enablity = enablity;
     }
 
-    public String getResourceAsXML(String sresourcename) {
-        return m_dlSystem.getResourceAsXML(sresourcename);
-    }
-
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Object getBean() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void init(AppView app) throws BeanFactoryException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    
 }
