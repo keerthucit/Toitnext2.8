@@ -1,0 +1,91 @@
+//    Openbravo POS is a point of sales application designed for touch screens.
+//    Copyright (C) 2007-2009 Openbravo, S.L.
+//    http://www.openbravo.com/product/pos
+//
+//    This file is part of Openbravo POS.
+//
+//    Openbravo POS is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    Openbravo POS is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with Openbravo POS.  If not, see <http://www.gnu.org/licenses/>.
+
+report = new com.openbravo.pos.reports.PanelReportBean();
+
+report.setTitleKey("Menu.TillCollectionReport");
+report.setReport("/com/sysfore/TillCollectionReport");
+report.setResourceBundle("com/sysfore/SettlementReport_messages");
+
+report.setSentence(" SELECT   "+
+                             "   G.TILT AS TILT,  "+
+                            "    G.USERID AS USER,  "+
+                             "   G.LOGIN AS LOGIN,  "+
+                             "   G.LOGOUT AS LOGOUT, "+
+                             "   F.PAYMENTTYPE AS PAYMENTTYPE, "+
+                             "  F.AMOUNT AS AMOUNT, "+
+                              "  G.OPENINGAMOUNT AS OPENINGAMOUNT,  "+
+                              "  G.CLOSINGAMOUNT AS CLOSINGAMOUNT  "+
+
+                            " FROM   "+
+                             "   (SELECT   "+
+                              "      b.tilt, b.sessionid, b.PAYMENTTYPE, SUM(b.AMOUNT) AS AMOUNT  "+
+                             "   FROM  "+
+                                  "  TILTTRANSACTION b  "+
+                              "  JOIN TILTSESSION ON TILTSESSION.id = b.SESSIONID  "+
+                             "   JOIN TILTBALANCE ON TILTBALANCE.SESSIONID = b.SESSIONID  "+
+                                  "  AND b.PAYMENTTYPE = TILTBALANCE.PAYMENTTYPE  "+
+                              " GROUP BY b.SESSIONID , b.PAYMENTTYPE ) AS F  "+
+                                "   JOIN  "+
+                              "  (SELECT   "+
+                                 "   TILTSESSION.tilt,TILTSESSION.userID, "+
+                                    "    TILTSESSION.LOGIN, "+
+                                    "    TILTSESSION.LOGOUT, "+
+                                     "   a.sessionid, "+
+                                     "   a.PAYMENTTYPE, "+
+                                     "   SUM(a.OPENINGAMOUNT) AS OPENINGAMOUNT, "+
+                                     "   SUM(a.CLOSINGAMOUNT) AS CLOSINGAMOUNT "+
+                             "   FROM "+
+                                  "  TILTBALANCE a "+
+                            "    JOIN TILTSESSION ON TILTSESSION.ID = a.SESSIONID "+
+                                "WHERE  ?(QBF_FILTER)  " +
+                               " GROUP BY a.SESSIONID , a.PAYMENTTYPE) AS G ON F.PAYMENTTYPE = G.PAYMENTTYPE "+
+                                  "  AND F.TILT = G.TILT AND F.SESSIONID=G.SESSIONID "+
+                                 "   ORDER BY LOGIN, PAYMENTTYPE  ");
+
+
+
+
+
+
+                
+
+report.addParameter("LOGIN");
+report.addParameter("LOGOUT");
+report.addQBFFilter(new com.openbravo.pos.reports.JParamsDatesInterval());
+report.addParameter("TILTSESSION.TILT");
+report.addQBFFilter(new com.openbravo.pos.ticket.TillFilter());
+report.addParameter("TILTSESSION.USERID");
+report.addQBFFilter(new com.openbravo.pos.ticket.TiltUserFilter());
+
+
+
+
+
+
+
+report.addField("TILT", com.openbravo.data.loader.Datas.STRING);
+report.addField("USER", com.openbravo.data.loader.Datas.STRING);
+report.addField("LOGIN", com.openbravo.data.loader.Datas.TIMESTAMP);
+report.addField("LOGOUT", com.openbravo.data.loader.Datas.TIMESTAMP);
+report.addField("PAYMENTTYPE", com.openbravo.data.loader.Datas.STRING);
+report.addField("AMOUNT", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("OPENINGAMOUNT", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("CLOSINGAMOUNT", com.openbravo.data.loader.Datas.DOUBLE);
+report;

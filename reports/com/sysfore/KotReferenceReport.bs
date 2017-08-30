@@ -1,0 +1,54 @@
+//    Openbravo POS is a point of sales application designed for touch screens.
+//    Copyright (C) 2007-2009 Openbravo, S.L.
+//    http://www.openbravo.com/product/pos
+//
+//    This file is part of Openbravo POS.
+//
+//    Openbravo POS is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    Openbravo POS is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with Openbravo POS.  If not, see <http://www.gnu.org/licenses/>.
+
+report = new com.openbravo.pos.reports.PanelReportBean();
+
+report.setTitleKey("Menu.KotReferenceReport");
+report.setReport("/com/sysfore/KotReferenceReport");
+report.setResourceBundle("com/sysfore/SalesByPeriodItemwise_messages");
+
+report.setSentence(" SELECT DATENEW, PLACES.NAME AS TABLENAME, KOTID, PRODUCTS.NAME AS ITEM, QTY, ISCANCELLED,  "+
+                                " KOTREASON.REASON AS CANCELREASON, PEOPLE.NAME AS PERSON, ORDERNUM, PLACES.ID FROM KOT   "+
+                                " LEFT JOIN PLACES ON PLACES.ID=KOT.TABLEID  "+
+                                " LEFT JOIN PRODUCTS ON PRODUCTS.ID=KOT.PRODUCTID  "+
+                                " LEFT JOIN KOTREASON ON KOTREASON.ID=KOT.REASONID  "+
+                                " LEFT JOIN PEOPLE ON PEOPLE.ID=KOT.PERSON  "+
+                                " WHERE  ?(QBF_FILTER) " +
+                                " ORDER BY DATENEW, ORDERNUM,  KOTID ");
+
+
+report.addParameter("DATENEW");
+report.addParameter("DATENEW");
+report.addQBFFilter(new com.openbravo.pos.reports.JParamsDatesInterval());
+report.addParameter("ISCANCELLED");
+report.addQBFFilter(new com.openbravo.pos.ticket.KotIsCancelFilter());
+report.addParameter("PLACES.ID");
+report.addQBFFilter(new com.openbravo.pos.ticket.TableFilter());
+
+report.addField("DATENEW", com.openbravo.data.loader.Datas.TIMESTAMP);
+report.addField("TABLENAME", com.openbravo.data.loader.Datas.STRING);
+report.addField("KOTID", com.openbravo.data.loader.Datas.INT);
+report.addField("ITEM", com.openbravo.data.loader.Datas.STRING);
+report.addField("QTY", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("ISCANCELLED", com.openbravo.data.loader.Datas.STRING);
+report.addField("CANCELREASON", com.openbravo.data.loader.Datas.STRING);
+report.addField("PERSON", com.openbravo.data.loader.Datas.STRING);
+report.addField("ORDERNUM", com.openbravo.data.loader.Datas.INT);
+
+report;

@@ -1,0 +1,66 @@
+//    Openbravo POS is a point of sales application designed for touch screens.
+//    Copyright (C) 2007-2009 Openbravo, S.L.
+//    http://www.openbravo.com/product/pos
+//
+//    This file is part of Openbravo POS.
+//
+//    Openbravo POS is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    Openbravo POS is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with Openbravo POS.  If not, see <http://www.gnu.org/licenses/>.
+
+report = new com.openbravo.pos.reports.PanelReportBean();
+
+report.setTitleKey("Menu.SalesDetailsReport");
+report.setReport("/com/sysfore/SalesDetailsReport");
+report.setResourceBundle("com/sysfore/TaxSummaryReport_messages");
+
+report.setSentence("SELECT DATENEW,BILLNO,PAX,USER,TAX,FOOD,ALCOHOL,MERCHANDIZE,TOBACCO,SOFTDRINKS,OTHERS,SERVICETAXAMT,SERVICECHARGEAMT,ENTERTAINMENTTAX, GST, CESS, ADDCESS, CGST, SGST,  CASH,CARD,CHEQUE,STAFF,COMP,VOUCHER,MOBILE,ROUNDOFFVALUE,BILLAMOUNT,FLOOR  FROM " +
+                   " BILLREPORT_VIEW"+
+                  " WHERE ?(QBF_FILTER)  ");
+               
+                
+
+report.addParameter("DATENEW");
+report.addParameter("DATENEW");
+report.addQBFFilter(new com.openbravo.pos.reports.JParamsDatesAfterJune());
+
+report.addField("DATENEW", com.openbravo.data.loader.Datas.TIMESTAMP);
+report.addField("BILLNO", com.openbravo.data.loader.Datas.INT);
+report.addField("PAX", com.openbravo.data.loader.Datas.INT);
+report.addField("USER", com.openbravo.data.loader.Datas.STRING);
+report.addField("TAX", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("FOOD",com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("ALCOHOL",com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("MERCHANDIZE",com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("TOBACCO",com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("SOFTDRINKS",com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("OTHERS",com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("SERVICETAXAMT", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("SERVICECHARGEAMT", com.openbravo.data.loader.Datas.DOUBLE); 
+report.addField("ENTERTAINMENTTAX", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("GST", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("CESS", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("ADDCESS", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("CGST", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("SGST", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("CASH", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("CARD", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("CHEQUE", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("STAFF", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("COMP", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("VOUCHER", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("MOBILE", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("ROUNDOFFVALUE", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("BILLAMOUNT", com.openbravo.data.loader.Datas.DOUBLE);
+report.addField("FLOOR", com.openbravo.data.loader.Datas.STRING);
+
+report;
