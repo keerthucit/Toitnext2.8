@@ -44,8 +44,10 @@ import javax.swing.JPanel;
 
 public class TillFilter extends javax.swing.JPanel implements ReportEditorCreator {
     
-    private SentenceList m_sentcat;
+    private SentenceList m_sentTilt;
+  //   private SentenceList m_sentUser;
     private ComboBoxValModel m_TillModel;
+   // private ComboBoxValModel m_TiltUserModel;
 
     /** Creates new form JQBFProduct */
     public TillFilter() {
@@ -56,16 +58,25 @@ System.out.println("inside section filter");
     public void init(AppView app) {
          
         DataLogicSales dlSales = (DataLogicSales) app.getBean("com.openbravo.pos.forms.DataLogicSales");
-        m_sentcat = dlSales.getTillList();
-        m_TillModel = new ComboBoxValModel();          
+        m_sentTilt = dlSales.getTillList();
+        m_TillModel = new ComboBoxValModel(); 
+       // m_sentUser=dlSales.getTiltUserList();
+       // m_TiltUserModel = new ComboBoxValModel(); 
+        
     }
     
     public void activate() throws BasicException {
 
-        List catlist = m_sentcat.list();
-        catlist.add(0, null);
-        m_TillModel = new ComboBoxValModel(catlist);
+        List tiltList = m_sentTilt.list();
+        tiltList.add(0, null);
+        m_TillModel = new ComboBoxValModel(tiltList);
         m_jTillFilter.setModel(m_TillModel);
+        
+//        List userList = m_sentUser.list();
+//        userList.add(0, null);
+//        m_TiltUserModel = new ComboBoxValModel(userList);
+//        m_jTiltUserFilter.setModel(m_TiltUserModel);
+//        
     }
     
     public SerializerWrite getSerializerWrite() {
@@ -89,7 +100,7 @@ System.out.println("inside section filter");
     private void initComponents() {
 
         m_jTillFilter = new javax.swing.JComboBox();
-        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(514, 32));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -99,11 +110,11 @@ System.out.println("inside section filter");
                 m_jTillFilterActionPerformed(evt);
             }
         });
-        add(m_jTillFilter, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 10, 200, 20));
+        add(m_jTillFilter, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 10, 210, 20));
 
-        jLabel2.setText("Tilt No.");
-        jLabel2.setPreferredSize(new java.awt.Dimension(110, 14));
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 107, -1));
+        jLabel3.setText("Tilt No.");
+        jLabel3.setPreferredSize(new java.awt.Dimension(110, 14));
+        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 4, 60, 30));
     }// </editor-fold>//GEN-END:initComponents
 
     private void m_jTillFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_m_jTillFilterActionPerformed
@@ -130,7 +141,7 @@ System.out.println("inside section filter");
     
 ////    
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JComboBox m_jTillFilter;
     // End of variables declaration//GEN-END:variables
 

@@ -679,13 +679,13 @@ group by tk.id,DATE_FORMAT(datenew, '%Y-%m-%d')]]></queryString>
 			</band>
 		</background>
 		<title>
-			<band height="70"  isSplitAllowed="true" >
+			<band height="105"  isSplitAllowed="true" >
 				<staticText>
 					<reportElement
 						style="form"
 						mode="Opaque"
 						x="0"
-						y="0"
+						y="35"
 						width="813"
 						height="40"
 						key="staticText-1"/>
@@ -705,7 +705,7 @@ group by tk.id,DATE_FORMAT(datenew, '%Y-%m-%d')]]></queryString>
 						style="form"
 						mode="Transparent"
 						x="0"
-						y="40"
+						y="75"
 						width="813"
 						height="30"
 						key="textField-18"/>
@@ -721,6 +721,27 @@ group by tk.id,DATE_FORMAT(datenew, '%Y-%m-%d')]]></queryString>
 				<textFieldExpression   class="java.lang.String"><![CDATA["From "+com.openbravo.format.Formats.TIMESTAMP.formatValue((java.util.Date)((Object[])((Object[])$P{ARG})[0])[1])+
 "  To "+com.openbravo.format.Formats.TIMESTAMP.formatValue((java.util.Date)((Object[])((Object[])$P{ARG})[0])[3])]]></textFieldExpression>
 				</textField>
+				<staticText>
+					<reportElement
+						style="form"
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="813"
+						height="35"
+						key="staticText-44"/>
+					<box leftPadding="1" rightPadding="1" topPadding="1" bottomPadding="1">					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" size="16" isBold="true"/>
+					</textElement>
+				<text><![CDATA[pH4 Food & Beverages Pvt. Ltd.
+]]></text>
+				</staticText>
 			</band>
 		</title>
 		<pageHeader>

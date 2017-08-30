@@ -24,7 +24,6 @@ import com.openbravo.pos.ticket.TaxInfo;
 import com.openbravo.pos.ticket.TicketInfo;
 import com.openbravo.pos.ticket.TicketLineInfo;
 
-
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -67,7 +66,6 @@ import com.openbravo.pos.ticket.TicketMergeTaxInfo;
 import com.openbravo.pos.ticket.TicketServiceChargeInfo;
 import com.openbravo.pos.ticket.TicketTaxInfo;
 import com.openbravo.pos.ticket.TillInfo;
-import com.openbravo.pos.ticket.TiltNameInfo;
 import com.openbravo.pos.ticket.TiltUserInfo;
 import com.openbravo.pos.ticket.UserInfo;
 import com.openbravo.util.date.DateFormats;
@@ -376,17 +374,14 @@ public class DataLogicSales extends BeanFactoryDataSingle {
     // Listados para combo
     public final SentenceList getTaxList() {
         return new StaticSentence(s, "SELECT ID, NAME, CATEGORY, CUSTCATEGORY, PARENTID, RATE, RATECASCADE, RATEORDER, ISSALESTAX, ISPURCHASETAX,ISSERVICETAX,DEBITACCOUNT,CREDITACCOUNT,ISSERVICECHARGE,BASEAMOUNT,TAXBASEID,ISTAKEAWAY FROM TAXES ORDER BY NAME", null, new SerializerRead() {
-            public Object readValues(DataRead dr) throws NullPointerException,BasicException {
+            public Object readValues(DataRead dr) throws BasicException {
                 return new TaxInfo(
                         dr.getString(1),
                         dr.getString(2),
                         dr.getString(3),
                         dr.getString(4),
                         dr.getString(5),
-                        
                         dr.getDouble(6).doubleValue(),
-    
-        
                         dr.getBoolean(7).booleanValue(),
                         dr.getInt(8),
                         dr.getString(9),
@@ -1229,8 +1224,9 @@ public class DataLogicSales extends BeanFactoryDataSingle {
 
         t.execute();
     }
- //final ArrayList<VouchersList> paysplits,
-    public final synchronized void saveRetailTicket(final RetailTicketInfo ticket, final String location, final String posNo, final String StoreName, final String ticketDocument,final java.util.ArrayList<BuyGetPriceInfo> pdtBuyGetPriceList, final String chequeNos, final String deliveryBoy, final String homeDelivery, final String cod, final double advanceissued, final double creditAmt, final String status, final String isCredit, final String isPaidStatus, final double tips, final String orderTaking, final String nonChargable) throws Exception {
+
+    public final synchronized void saveRetailTicket(final RetailTicketInfo ticket, final String location, final String posNo, final String StoreName, final String ticketDocument, //final ArrayList<VouchersList> paysplits,
+            final java.util.ArrayList<BuyGetPriceInfo> pdtBuyGetPriceList, final String chequeNos, final String deliveryBoy, final String homeDelivery, final String cod, final double advanceissued, final double creditAmt, final String status, final String isCredit, final String isPaidStatus, final double tips, final String orderTaking, final String nonChargable) throws Exception {
         Transaction t = new Transaction(s) {
             private String docNo;
             Integer docNoInt;
@@ -4321,7 +4317,7 @@ public class DataLogicSales extends BeanFactoryDataSingle {
 //
 //    }
     public String getProductCode(String pName) throws BasicException {
-        String productName = pName.replace("'","''");
+        String productName = pName.replace("'", "''");
         Object[] record = (Object[]) new StaticSentence(s, "SELECT CODE FROM PRODUCTS WHERE NAME ='" + productName + "' ", SerializerWriteString.INSTANCE, new SerializerReadBasic(new Datas[]{Datas.STRING})).find(pName);
         return record == null ? null : (String) record[0];
     }
@@ -4334,15 +4330,12 @@ public class DataLogicSales extends BeanFactoryDataSingle {
             return record == null ? null : (RetailTicketInfo) record[0];
         }
     }
-      
-       public final SentenceList getTillList() {
+
+    public final SentenceList getTillList() {
         return new StaticSentence(s, "SELECT DISTINCT TILT  FROM TILTSESSION ", null, TillInfo.getSerializerRead());
     }
-       public final SentenceList getTiltUserList() {
+
+    public final SentenceList getTiltUserList() {
         return new StaticSentence(s, "SELECT DISTINCT USERID  FROM TILTSESSION ", null, TiltUserInfo.getSerializerRead());
     }
-       
-     
-      
-
 }
